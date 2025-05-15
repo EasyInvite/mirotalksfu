@@ -2919,7 +2919,7 @@ class RoomClient {
 
                 vb = document.createElement('div');
                 vb.id = id + '__vb';
-                vb.className = 'videoMenuBar hidden';
+                vb.className = 'videoMenuBar';
 
                 eDiv = document.createElement('div');
                 eDiv.className = 'expand-video';
@@ -3210,7 +3210,7 @@ class RoomClient {
 
         vb = document.createElement('div');
         vb.id = peer_id + '__vb';
-        vb.className = 'videoMenuBar hidden';
+        vb.className = 'videoMenuBar';
 
         au = this.createButton(peer_id + '__audio', peer_audio ? html.audioOn : html.audioOff);
 
