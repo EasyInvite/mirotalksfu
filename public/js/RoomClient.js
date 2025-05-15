@@ -4395,13 +4395,13 @@ class RoomClient {
 
                 if (videoBar.classList.contains('hidden')) {
                     rc.sound('open');
-                    show(videoBar);
-                    animateCSS(videoBar, 'fadeInDown');
+                    // show(videoBar);
+                    // animateCSS(videoBar, 'fadeInDown');
                     if (participantsCount > 1) videoPlayer.style.border = 'var(--videoBar-active)';
                 } else {
-                    animateCSS(videoBar, 'fadeOutUp').then((msg) => {
-                        hide(videoBar);
-                    });
+                    // animateCSS(videoBar, 'fadeOutUp').then((msg) => {
+                    //     hide(videoBar);
+                    // });
                     videoPlayer.style.border = 'none';
                 }
             });
