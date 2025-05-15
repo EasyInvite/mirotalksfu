@@ -88,6 +88,7 @@ const image = {
     delete: '../images/delete.png',
     locked: '../images/locked.png',
     mute: '../images/mute.png',
+    qualityProSaude: '../images/quality.png',
     hide: '../images/hide.png',
     stop: '../images/stop.png',
     unmute: '../images/unmute.png',
@@ -601,7 +602,7 @@ class RoomClient {
             if (BUTTONS.settings.tabRecording) {
                 room.config.hostOnlyRecording
                     ? (console.log('07.1 ----> WARNING Room Host only recording enabled'),
-                      this.event(_EVENTS.hostOnlyRecordingOn))
+                        this.event(_EVENTS.hostOnlyRecordingOn))
                     : this.event(_EVENTS.hostOnlyRecordingOff);
             }
 
@@ -1994,7 +1995,7 @@ class RoomClient {
                         imageUrlInput.value = clipboardText;
                     }
                 })
-                .catch(() => {});
+                .catch(() => { });
         }
 
         saveImageUrlBtn.addEventListener('click', async () => {
@@ -2456,7 +2457,12 @@ class RoomClient {
 
                 vb = document.createElement('div');
                 vb.id = id + '__vb';
-                vb.className = 'videoMenuBar hidden';
+                vb.className = 'videoMenuBar';
+                let videoMenuBarLogo = createElement('img')
+                videoMenuBarLogo.src = image.qualityProSaude
+                let videoMenuBarButtons = createElement('div')
+
+                videoMenuBarLogo.style = `margin-left: auto; margin-right: auto`
 
                 pip = this.createButton(id + '__pictureInPicture', html.pip);
                 fs = this.createButton(id + '__fullScreen', html.fullScreen);
@@ -2495,24 +2501,26 @@ class RoomClient {
                 pv.max = 100;
                 pv.value = 100;
 
-                BUTTONS.producerVideo.audioVolumeInput && vb.appendChild(pv);
-                BUTTONS.producerVideo.muteAudioButton && vb.appendChild(au);
-                BUTTONS.producerVideo.videoPrivacyButton && !isScreen && vb.appendChild(vp);
-                BUTTONS.producerVideo.snapShotButton && vb.appendChild(ts);
+                BUTTONS.producerVideo.audioVolumeInput && videoMenuBarButtons.appendChild(pv);
+                BUTTONS.producerVideo.muteAudioButton && videoMenuBarButtons.appendChild(au);
+                BUTTONS.producerVideo.videoPrivacyButton && !isScreen && videoMenuBarButtons.appendChild(vp);
+                BUTTONS.producerVideo.snapShotButton && videoMenuBarButtons.appendChild(ts);
                 BUTTONS.producerVideo.videoPictureInPicture &&
                     this.isVideoPictureInPictureSupported &&
-                    vb.appendChild(pip);
-                BUTTONS.producerVideo.videoMirrorButton && vb.appendChild(mv);
-                BUTTONS.producerVideo.fullScreenButton && this.isVideoFullScreenSupported && vb.appendChild(fs);
+                    videoMenuBarButtons.appendChild(pip);
+                BUTTONS.producerVideo.videoMirrorButton && videoMenuBarButtons.appendChild(mv);
+                BUTTONS.producerVideo.fullScreenButton && this.isVideoFullScreenSupported && videoMenuBarButtons.appendChild(fs);
 
-                if (!this.isMobileDevice) vb.appendChild(pn);
+                if (!this.isMobileDevice) videoMenuBarButtons.appendChild(pn);
 
-                vb.appendChild(p);
+                videoMenuBarButtons.appendChild(p);
                 d.appendChild(elem);
                 d.appendChild(pm);
                 d.appendChild(i);
                 d.appendChild(p);
                 //d.appendChild(vb);
+                vb.appendChild(videoMenuBarLogo)
+                vb.appendChild(videoMenuBarButtons)
                 document.body.appendChild(vb);
                 this.videoMediaContainer.appendChild(d);
 
@@ -4378,7 +4386,7 @@ class RoomClient {
                 for (let i = 0; i < videoMenuBar.length; i++) {
                     const menuBar = videoMenuBar[i];
                     if (menuBar.id != videoBarId) {
-                        hide(menuBar);
+                        // hide(menuBar);
                     }
                 }
 
@@ -5072,8 +5080,8 @@ class RoomClient {
             peerAvatar && this.isImageURL(peerAvatar)
                 ? peerAvatar
                 : this.isValidEmail(peerName)
-                  ? this.genGravatar(peerName)
-                  : this.genAvatarSvg(peerName, 32);
+                    ? this.genGravatar(peerName)
+                    : this.genAvatarSvg(peerName, 32);
         avatar === 'left' ? (this.leftMsgAvatar = avatarImg) : (this.rightMsgAvatar = avatarImg);
     }
 
@@ -5302,7 +5310,7 @@ class RoomClient {
     isHtml(str) {
         const a = document.createElement('div');
         a.innerHTML = str;
-        for (var c = a.childNodes, i = c.length; i--; ) {
+        for (var c = a.childNodes, i = c.length; i--;) {
             if (c[i].nodeType == 1) return true;
         }
         return false;
@@ -7418,10 +7426,10 @@ class RoomClient {
                 active
                     ? this.userLog('info', `${icons.chat} Chat will be shown, when you receive a message`, 'top-end')
                     : this.userLog(
-                          'info',
-                          `${icons.chat} Chat not will be shown, when you receive a message`,
-                          'top-end',
-                      );
+                        'info',
+                        `${icons.chat} Chat not will be shown, when you receive a message`,
+                        'top-end',
+                    );
                 break;
             case 'speechMessages':
                 this.userLog('info', `${icons.speech} Speech incoming messages ${status}`, 'top-end');
@@ -7429,15 +7437,15 @@ class RoomClient {
             case 'transcriptShowOnMsg':
                 active
                     ? this.userLog(
-                          'info',
-                          `${icons.transcript} Transcript will be shown, when you receive a message`,
-                          'top-end',
-                      )
+                        'info',
+                        `${icons.transcript} Transcript will be shown, when you receive a message`,
+                        'top-end',
+                    )
                     : this.userLog(
-                          'info',
-                          `${icons.transcript} Transcript not will be shown, when you receive a message`,
-                          'top-end',
-                      );
+                        'info',
+                        `${icons.transcript} Transcript not will be shown, when you receive a message`,
+                        'top-end',
+                    );
                 break;
             case 'video_start_privacy':
                 this.userLog(
@@ -7547,8 +7555,8 @@ class RoomClient {
                         peer_avatar && this.isImageURL(peer_avatar)
                             ? peer_avatar
                             : this.isValidEmail(peer_name)
-                              ? this.genGravatar(peer_name, 32)
-                              : this.genAvatarSvg(peer_name, 32);
+                                ? this.genGravatar(peer_name, 32)
+                                : this.genAvatarSvg(peer_name, 32);
 
                     let lobbyTb = this.getId('lobbyTb');
                     let lobbyAccept = _PEER.acceptPeer;
@@ -8456,9 +8464,8 @@ class RoomClient {
             switch (action) {
                 case 'ban':
                     if (peerActionAllowed) {
-                        const message = `Will ban you from the room${
-                            msg ? `<br><br><span class="red">Reason: ${msg}</span>` : ''
-                        }`;
+                        const message = `Will ban you from the room${msg ? `<br><br><span class="red">Reason: ${msg}</span>` : ''
+                            }`;
                         this.exit(true);
                         this.sound(action);
                         this.peerActionProgress(from_peer_name, message, 5000, action);
@@ -8466,9 +8473,8 @@ class RoomClient {
                     break;
                 case 'eject':
                     if (peerActionAllowed) {
-                        const message = `Will eject you from the room${
-                            msg ? `<br><br><span class="red">Reason: ${msg}</span>` : ''
-                        }`;
+                        const message = `Will eject you from the room${msg ? `<br><br><span class="red">Reason: ${msg}</span>` : ''
+                            }`;
                         this.exit(true);
                         this.sound(action);
                         this.peerActionProgress(from_peer_name, message, 5000, action);

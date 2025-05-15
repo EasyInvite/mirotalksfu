@@ -126,7 +126,7 @@
 .videoMenuBar {
     z-index: 2;
     position: fixed;
-    display: inline;
+    display: flex;
     top: 0;
     left: 0;
     padding: 15px;
