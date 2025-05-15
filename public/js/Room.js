@@ -1752,7 +1752,7 @@ function handleButtons() {
         }
         isHideMeActive = !isHideMeActive;
         rc.handleHideMe();
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
     };
     settingsButton.onclick = () => {
         rc.toggleMySettings();
@@ -2018,7 +2018,7 @@ function handleButtons() {
     };
     raiseHandButton.onclick = () => {
         rc.updatePeerInfo(peer_name, socket.id, 'hand', true);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
     };
     lowerHandButton.onclick = () => {
         rc.updatePeerInfo(peer_name, socket.id, 'hand', false);
@@ -3397,7 +3397,7 @@ function handleRoomClientEvents() {
         show(stopVideoButton);
         setColor(startVideoButton, 'red');
         setVideoButtonsDisabled(false);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         // if (isParticipantsListOpen) getRoomParticipants();
         video = true;
     });
@@ -3407,7 +3407,7 @@ function handleRoomClientEvents() {
         show(startVideoButton);
         setColor(startVideoButton, 'red');
         setVideoButtonsDisabled(false);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         video = false;
     });
     rc.on(RoomClient.EVENTS.resumeVideo, () => {
@@ -3416,7 +3416,7 @@ function handleRoomClientEvents() {
         show(stopVideoButton);
         setVideoButtonsDisabled(false);
         isVideoPrivacyActive = false;
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         video = true;
     });
     rc.on(RoomClient.EVENTS.stopVideo, () => {
@@ -3425,7 +3425,7 @@ function handleRoomClientEvents() {
         show(startVideoButton);
         setVideoButtonsDisabled(false);
         isVideoPrivacyActive = false;
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         // if (isParticipantsListOpen) getRoomParticipants();
         video = false;
     });
@@ -3433,7 +3433,7 @@ function handleRoomClientEvents() {
         console.log('Room event: Client start screen');
         hide(startScreenButton);
         show(stopScreenButton);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         // if (isParticipantsListOpen) getRoomParticipants();
         screen = true;
     });
@@ -3441,21 +3441,21 @@ function handleRoomClientEvents() {
         console.log('Room event: Client pause screen');
         hide(startScreenButton);
         show(stopScreenButton);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         screen = false;
     });
     rc.on(RoomClient.EVENTS.resumeScreen, () => {
         console.log('Room event: Client resume screen');
         hide(stopScreenButton);
         show(startScreenButton);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         screen = true;
     });
     rc.on(RoomClient.EVENTS.stopScreen, () => {
         console.log('Room event: Client stop screen');
         hide(stopScreenButton);
         show(startScreenButton);
-        hideClassElements('videoMenuBar');
+        // hideClassElements('videoMenuBar');
         // if (isParticipantsListOpen) getRoomParticipants();
         screen = false;
     });
@@ -3690,7 +3690,7 @@ function toggleExtraButtons() {
 
     elemDisplay('control', isControlHidden, displayValue);
     toggleExtraButton.innerHTML = iconHtml;
-    hideClassElements('videoMenuBar');
+    // hideClassElements('videoMenuBar');
 }
 
 function hideClassElements(className) {
