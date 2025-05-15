@@ -2458,9 +2458,9 @@ class RoomClient {
                 vb = document.createElement('div');
                 vb.id = id + '__vb';
                 vb.className = 'videoMenuBar';
-                let videoMenuBarLogo = createElement('img')
+                let videoMenuBarLogo = document.createElement('img')
                 videoMenuBarLogo.src = image.qualityProSaude
-                let videoMenuBarButtons = createElement('div')
+                let videoMenuBarButtons = document.createElement('div')
 
                 videoMenuBarLogo.style = `margin-left: auto; margin-right: auto`
 
