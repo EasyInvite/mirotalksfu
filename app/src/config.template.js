@@ -271,8 +271,8 @@ module.exports = {
                 enabled: process.env.IP_WHITELIST_ENABLED === 'true',
                 allowedIPs: process.env.IP_WHITELIST_ALLOWED
                     ? process.env.IP_WHITELIST_ALLOWED.split(splitChar)
-                          .map((ip) => ip.trim())
-                          .filter((ip) => ip !== '')
+                        .map((ip) => ip.trim())
+                        .filter((ip) => ip !== '')
                     : ['127.0.0.1', '::1'],
             },
         },
@@ -418,8 +418,8 @@ module.exports = {
                     displayname: process.env.DEFAULT_DISPLAY_NAME || 'username display name',
                     allowed_rooms: process.env.DEFAULT_ALLOWED_ROOMS
                         ? process.env.DEFAULT_ALLOWED_ROOMS.split(splitChar)
-                              .map((room) => room.trim())
-                              .filter((room) => room !== '')
+                            .map((room) => room.trim())
+                            .filter((room) => room !== '')
                         : ['*'],
                 },
                 // Additional users can be added here
@@ -428,8 +428,8 @@ module.exports = {
             presenters: {
                 list: process.env.PRESENTERS
                     ? process.env.PRESENTERS.split(splitChar)
-                          .map((presenter) => presenter.trim())
-                          .filter((presenter) => presenter !== '')
+                        .map((presenter) => presenter.trim())
+                        .filter((presenter) => presenter !== '')
                     : ['Miroslav Pejic', 'miroslav.pejic.85@gmail.com'],
                 join_first: process.env.PRESENTER_JOIN_FIRST !== 'false',
             },
@@ -903,6 +903,7 @@ module.exports = {
          */
         aws: {
             enabled: process.env.AWS_S3_ENABLED === 'true',
+            endpoint: process.env.AWS_S3_ENDPOINT,
             accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'your-access-key-id',
             secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'your-secret-access-key',
             region: process.env.AWS_REGION || 'us-east-2',

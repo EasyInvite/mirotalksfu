@@ -4,7 +4,7 @@
 ███████ ███████ ██████  ██    ██ ███████ ██████  
 ██      ██      ██   ██ ██    ██ ██      ██   ██ 
 ███████ █████   ██████  ██    ██ █████   ██████  
-     ██ ██      ██   ██  ██  ██  ██      ██   ██ 
+     ██ ██      ██   ██  ██  ██  ██      ██   ██ 
 ███████ ███████ ██   ██   ████   ███████ ██   ██                                           
 
 prod dependencies: {
@@ -269,6 +269,9 @@ if (rtmpEnabled) {
 // ####################################################
 
 const s3Client = new S3Client({
+    ...(config?.integrations?.aws?.endpoint ? {
+        endpoint: config?.integrations?.aws?.endpoint,
+    } : {}),
     region: config?.integrations?.aws?.region, // Set your AWS region
     credentials: {
         accessKeyId: config?.integrations?.aws?.accessKeyId,
@@ -487,9 +490,9 @@ function startServer() {
 
             const config = OIDC.baseUrlDynamic
                 ? {
-                      ...OIDC.config,
-                      baseURL,
-                  }
+                    ...OIDC.config,
+                    baseURL,
+                }
                 : OIDC.config;
 
             log.debug('OIDC baseURL', config.baseURL);
@@ -2171,7 +2174,7 @@ function startServer() {
             socket.emit('newProducers', producerList);
         });
 
-        socket.on('getPeerCounts', async ({}, callback) => {
+        socket.on('getPeerCounts', async ({ }, callback) => {
             if (!roomExists(socket)) {
                 return callback({ error: 'Room not found' });
             }
@@ -2733,7 +2736,7 @@ function startServer() {
         });
 
         // https://docs.heygen.com/reference/list-avatars-v2
-        socket.on('getAvatarList', async ({}, cb) => {
+        socket.on('getAvatarList', async ({ }, cb) => {
             if (!config?.integrations?.videoAI?.enabled || !config?.integrations?.videoAI?.apiKey)
                 return cb({ error: 'Video AI seems disabled, try later!' });
 
@@ -2757,7 +2760,7 @@ function startServer() {
         });
 
         // https://docs.heygen.com/reference/list-voices-v2
-        socket.on('getVoiceList', async ({}, cb) => {
+        socket.on('getVoiceList', async ({ }, cb) => {
             if (!config?.integrations?.videoAI?.enabled || !config?.integrations?.videoAI?.apiKey)
                 return cb({ error: 'Video AI seems disabled, try later!' });
 
@@ -3000,7 +3003,7 @@ function startServer() {
             }
         });
 
-        socket.on('getRTMP', async ({}, cb) => {
+        socket.on('getRTMP', async ({ }, cb) => {
             if (!roomExists(socket)) return;
 
             const room = getRoom(socket);
