@@ -1150,11 +1150,11 @@ async function whoAreYou() {
         background: swalBackground,
         title: BRAND.app?.name,
         input: 'text',
-        inputPlaceholder: 'Enter your email or name',
+        inputPlaceholder: 'Insira seu e-mail',
         inputAttributes: { maxlength: 32, id: 'usernameInput' },
         inputValue: default_name,
         html: initUser, // Inject HTML
-        confirmButtonText: `Join meeting`,
+        confirmButtonText: `Iniciar Atendimento`,
         customClass: { popup: 'init-modal-size' },
         showClass: { popup: 'animate__animated animate__fadeInDown' },
         hideClass: { popup: 'animate__animated animate__fadeOutUp' },
@@ -5413,7 +5413,7 @@ function showAbout() {
                             <a 
                                 id="email-button" 
                                 data-umami-event="Email button" 
-                                href="mailto:miroslav.pejic.85@gmail.com?subject=MiroTalk SFU info"> 
+                                href="mailto:miroslav.pejic.85@gmail.com?subject=Quallity Pró Saúde info"> 
                                 miroslav.pejic.85@gmail.com
                             </a>
                             <br /><br />

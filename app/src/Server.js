@@ -269,9 +269,10 @@ if (rtmpEnabled) {
 // ####################################################
 
 const s3Client = new S3Client({
-    ...(config?.integrations?.aws?.endpoint ? {
-        endpoint: config?.integrations?.aws?.endpoint,
-    } : {}),
+     endpoint: "https://nyc3.digitaloceanspaces.com",
+    // ...(config?.integrations?.aws?.endpoint ? {
+    //     endpoint: config?.integrations?.aws?.endpoint,
+    // } : {}),
     region: config?.integrations?.aws?.region, // Set your AWS region
     credentials: {
         accessKeyId: config?.integrations?.aws?.accessKeyId,
