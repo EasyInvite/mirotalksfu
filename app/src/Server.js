@@ -121,6 +121,8 @@ let rtmpUrlStreamsCount = 0;
 // Email alerts and notifications
 const nodemailer = require('./lib/nodemailer');
 
+const activeRooms = new Map();
+
 // Slack API
 const CryptoJS = require('crypto-js');
 const qS = require('qs');
@@ -269,7 +271,7 @@ if (rtmpEnabled) {
 // ####################################################
 
 const s3Client = new S3Client({
-     endpoint: "https://nyc3.digitaloceanspaces.com",
+    endpoint: "https://nyc3.digitaloceanspaces.com",
     // ...(config?.integrations?.aws?.endpoint ? {
     //     endpoint: config?.integrations?.aws?.endpoint,
     // } : {}),
@@ -515,6 +517,11 @@ function startServer() {
         });
     }
 
+    app.get('/api/rooms', (req, res) => {
+        res.json({ rooms: [...activeRooms.keys()] });
+    });
+
+
     // Route to display user information
     app.get('/profile', OIDCAuth, (req, res) => {
         if (OIDC.enabled) {
@@ -612,6 +619,72 @@ function startServer() {
             }
         } else {
             htmlInjector.injectHtml(views.newRoom, res);
+        }
+    });
+
+    app.post('/api/drfast/duration', async (req, res) => {
+        const { duration, room_id: scheduling_room_id } = req.body; // Pegamos room_id do frontend
+
+        console.log(`[BACKEND MIROTALK] Recebido pedido para atualizar duração: room_id=${scheduling_room_id}, duration=${duration}`);
+
+        // Pegue as credenciais da sua API terceira do .env
+        // Estas variáveis PRECISAM estar no seu arquivo .env na raiz do projeto MiroTalk
+        const apiEmail = process.env.API_EMAIL;
+        const apiPassword = process.env.API_PASSWORD;
+
+        const userCredentials = {
+            email: process.env.API_EMAIL,
+            password: process.env.API_PASSWORD
+
+        };
+
+        if (!apiEmail || !apiPassword) {
+            console.error('[BACKEND MIROTALK] ERRO: API_EMAIL ou API_PASSWORD não configurados no .env!');
+            return res.status(500).json({ message: 'Erro de configuração no servidor MiroTalk.' });
+        }
+
+        const loginUrl = 'http://host.docker.internal:3001/auth/login'; // URL da sua API terceira para login
+        const updateUrl = `http://host.docker.internal:3001/scheduling/${scheduling_room_id}`; // URL para o PUT
+
+        try {
+            // 1. Login na sua API terceira
+            console.log(`[BACKEND MIROTALK] Autenticando na API terceira (${loginUrl})...`);
+            const loginResponse = await axios.post(loginUrl, userCredentials);
+
+            const token = loginResponse.data?.data?.attributes?.accessToken;
+
+            if (!token) {
+                console.error('[BACKEND MIROTALK] Token não obtido da API terceira:', loginResponse.data);
+                return res.status(500).json({ message: 'Falha ao autenticar com a API terceira.' });
+            }
+            console.log('[BACKEND MIROTALK] Autenticação na API terceira bem-sucedida!');
+
+            // 2. Fazer a requisição PUT para atualizar a duração na sua API terceira
+            console.log(`[BACKEND MIROTALK] Enviando PUT para ${updateUrl} com duração ${duration}...`);
+            const putPayload = { duration: duration }; // O payload para o PUT
+            const putResponse = await axios.put(updateUrl, putPayload, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            console.log('[BACKEND MIROTALK] Resposta da API terceira (PUT):', putResponse.data);
+            // 3. Enviar resposta de sucesso de volta para o frontend do MiroTalk
+            res.status(200).json({
+                message: 'Duração atualizada com sucesso na API terceira!',
+                apiResponse: putResponse.data,
+            });
+        } catch (error) {
+            console.error(
+                '[BACKEND MIROTALK] Erro ao comunicar com a API terceira:',
+                error.response ? error.response.data : error.message,
+            );
+            // 3. Enviar resposta de erro de volta para o frontend do MiroTalk
+            res.status(500).json({
+                message: 'Falha ao comunicar com a API terceira.',
+                errorDetails: error.response ? error.response.data : error.message,
+            });
         }
     });
 
@@ -1603,7 +1676,7 @@ function startServer() {
     // ####################################################
     // SOCKET IO
     // ####################################################
-
+    const activeRooms = new Map();
     io.on('connection', (socket) => {
         socket.on('clientError', (error) => {
             try {
@@ -1634,6 +1707,11 @@ function startServer() {
                 roomList.set(socket.room_id, new Room(socket.room_id, worker, io));
                 callback({ room_id: socket.room_id });
             }
+
+            if (!activeRooms.has(socket.room_id)) {
+                activeRooms.set(socket.room_id, []);
+            }
+            activeRooms.get(socket.room_id).push(socket.id);
         });
 
         socket.on('join', async (dataObject, cb) => {
@@ -3242,6 +3320,15 @@ function startServer() {
         });
 
         socket.on('disconnect', (reason) => {
+            activeRooms.forEach((sockets, roomId) => {
+                const updated = sockets.filter(id => id !== socket.id);
+                if (updated.length > 0) {
+                    activeRooms.set(roomId, updated);
+                } else {
+                    activeRooms.delete(roomId); // Sala ficou vazia
+                }
+            });
+
             if (!roomExists(socket)) return;
 
             const { room, peer } = getRoomAndPeer(socket);

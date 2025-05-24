@@ -892,7 +892,8 @@ function getRoomPassword() {
         console.log('Direct join', { password: roomPassword });
         return roomPassword;
     }
-    return false;
+    return 123456
+    // return false;
 }
 
 function getRoomDuration() {
@@ -1150,7 +1151,7 @@ async function whoAreYou() {
         background: swalBackground,
         title: BRAND.app?.name,
         input: 'text',
-        inputPlaceholder: 'Insira seu e-mail',
+        inputPlaceholder: 'Insira seu nome',
         inputAttributes: { maxlength: 32, id: 'usernameInput' },
         inputValue: default_name,
         html: initUser, // Inject HTML
@@ -1221,8 +1222,8 @@ function handleVideo() {
     elemDisplay('imageGrid', false);
 
     isVideoAllowed &&
-    isMediaStreamTrackAndTransformerSupported &&
-    (BUTTONS.settings.virtualBackground !== undefined ? BUTTONS.settings.virtualBackground : true)
+        isMediaStreamTrackAndTransformerSupported &&
+        (BUTTONS.settings.virtualBackground !== undefined ? BUTTONS.settings.virtualBackground : true)
         ? show(initVirtualBackgroundButton)
         : hide(initVirtualBackgroundButton);
 }
@@ -1254,8 +1255,8 @@ async function handleAudioVideo() {
     elemDisplay('imageGrid', false);
 
     isVideoAllowed &&
-    isMediaStreamTrackAndTransformerSupported &&
-    (BUTTONS.settings.virtualBackground !== undefined ? BUTTONS.settings.virtualBackground : true)
+        isMediaStreamTrackAndTransformerSupported &&
+        (BUTTONS.settings.virtualBackground !== undefined ? BUTTONS.settings.virtualBackground : true)
         ? show(initVirtualBackgroundButton)
         : hide(initVirtualBackgroundButton);
 }
@@ -1495,7 +1496,8 @@ function roomIsReady() {
         myProfileAvatar.setAttribute('src', rc.genAvatarSvg(peer_name, 64));
     }
 
-    show(toggleExtraButton); //*
+    // show(toggleExtraButton); //*
+    hide(toggleExtraButton);
     BUTTONS.main.exitButton && show(exitButton);
     BUTTONS.main.shareButton && show(shareButton);
     BUTTONS.main.hideMeButton && show(hideMeButton);
@@ -1579,6 +1581,9 @@ function roomIsReady() {
             show(startRtmpURLButton) &&
             show(streamerRtmpButton);
     }
+    // if (rc && typeof rc.toggleChat === 'function') {
+    //     rc.toggleChat();
+    // }
     if (!parserResult.browser.name.toLowerCase().includes('safari')) {
         document.onfullscreenchange = () => {
             if (!document.fullscreenElement) rc.isDocumentOnFullScreen = false;
@@ -1698,7 +1703,7 @@ function startRecordingTimer() {
         }
     }, 1000);
 }
-function stopRecordingTimer() {
+async function stopRecordingTimer() {
     clearInterval(recTimer);
 }
 
@@ -3314,6 +3319,29 @@ function loadSettingsFromLocalStorage() {
 // ROOM CLIENT EVENT LISTNERS
 // ####################################################
 
+async function setDurationIntoAPI() {
+    const payload = {
+        duration: recElapsedTime, // A duração da gravação
+        room_id: room_id          // O ID da sala para identificar no backend
+    };
+
+    try {
+        const response = await axios.post('/api/drfast/duration', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        console.log('Resposta do backend MiroTalk:', response.data);
+        // Adicione aqui qualquer feedback para o usuário, se necessário
+    } catch (error) {
+        console.error(
+            'Erro ao enviar dados para o backend MiroTalk:',
+            error.response ? error.response.data : error.message,
+        );
+        // Adicione aqui qualquer feedback de erro para o usuário, se necessário
+    }
+}
+
 function handleRoomClientEvents() {
     rc.on(RoomClient.EVENTS.startRec, () => {
         console.log('Room event: Client start recoding');
@@ -3335,7 +3363,7 @@ function handleRoomClientEvents() {
         hide(resumeRecButton);
         show(pauseRecButton);
     });
-    rc.on(RoomClient.EVENTS.stopRec, () => {
+    rc.on(RoomClient.EVENTS.stopRec, async () => {
         console.log('Room event: Client stop recoding');
         hide(stopRecButton);
         hide(pauseRecButton);
@@ -3345,6 +3373,7 @@ function handleRoomClientEvents() {
         stopRecordingTimer();
         isRecording = false;
         rc.updatePeerInfo(peer_name, socket.id, 'recording', false);
+        await setDurationIntoAPI()
     });
     rc.on(RoomClient.EVENTS.raiseHand, () => {
         console.log('Room event: Client raise hand');
@@ -3707,7 +3736,6 @@ function setCamerasBorderNone() {
         cameras[i].style.border = 'none';
     }
 }
-
 // https://animate.style
 
 function animateCSS(element, animation, prefix = 'animate__') {
@@ -3806,7 +3834,7 @@ function getCookie(cName) {
 function isHtml(str) {
     var a = document.createElement('div');
     a.innerHTML = str;
-    for (var c = a.childNodes, i = c.length; i--; ) {
+    for (var c = a.childNodes, i = c.length; i--;) {
         if (c[i].nodeType == 1) return true;
     }
     return false;
@@ -4474,7 +4502,7 @@ function getParticipantsList(peers) {
         </li>`;
     }
 
-    const deepSeek = BUTTONS.chat.deepSeek !== undefined ? BUTTONS.chat.deepSeek : true;
+    const deepSeek = BUTTONS.chat.deepSeek !== undefined ? BUTTONS.chat.deepSeek : false;
 
     // DEEP-SEEK
     if (deepSeek) {
@@ -5176,7 +5204,7 @@ function showImageSelector() {
                     initImageUrlInput.value = clipboardText;
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     initSaveImageUrlBtn.addEventListener('click', async () => {
@@ -5389,10 +5417,9 @@ function showAbout() {
         html: `
             <br />
             <div id="about">
-                ${
-                    BRAND.about?.html && BRAND.about.html.trim() !== ''
-                        ? BRAND.about.html
-                        : `
+                ${BRAND.about?.html && BRAND.about.html.trim() !== ''
+                ? BRAND.about.html
+                : `
                             <button 
                                 id="support-button" 
                                 data-umami-event="Support button" 
@@ -5421,7 +5448,7 @@ function showAbout() {
                             <span>&copy; 2025 MiroTalk SFU, all rights reserved</span>
                             <hr />
                         `
-                }
+            }
             </div>
         `,
         showClass: { popup: 'animate__animated animate__fadeInDown' },

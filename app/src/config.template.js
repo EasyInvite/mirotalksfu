@@ -469,7 +469,7 @@ module.exports = {
         keySecret: process.env.API_SECRET || 'mirotalksfu_default_secret',
         allowed: {
             stats: process.env.API_ALLOW_STATS !== 'false',
-            meetings: false,
+            meetings: true,
             meeting: true,
             join: true,
             token: false,
@@ -567,7 +567,7 @@ module.exports = {
          *
          */
         deepSeek: {
-            enabled: process.env.DEEP_SEEK_ENABLED === 'true',
+            enabled: process.env.DEEP_SEEK_ENABLED === 'false',
             basePath: process.env.DEEP_SEEK_BASE_PATH || 'https://api.deepseek.com/v1/',
             apiKey: process.env.DEEP_SEEK_API_KEY || '',
             model: process.env.DEEP_SEEK_MODEL || 'deepseek-chat',

@@ -45,7 +45,7 @@ class LocalStorage {
             broadcasting: false, // default false (one to many a/v streaming)
             lobby: false, // default false
             pitch_bar: true, // volume indicator
-            sounds: true, // room notify sounds
+            sounds: false, // room notify sounds
             keep_buttons_visible: false, // Keep buttons always visible
             keyboard_shortcuts: false, // keyboard shortcuts
             host_only_recording: false, // presenter

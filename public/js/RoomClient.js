@@ -250,6 +250,7 @@ class RoomClient {
         this.peer_avatar = peer_info.peer_avatar;
         this.peer_uuid = peer_uuid;
         this.peer_info = peer_info;
+        
 
         // Device type
         this.isDesktopDevice = peer_info.is_desktop_device;
@@ -2506,12 +2507,12 @@ class RoomClient {
 
                 BUTTONS.producerVideo.audioVolumeInput && videoMenuBarButtons.appendChild(pv);
                 BUTTONS.producerVideo.muteAudioButton && videoMenuBarButtons.appendChild(au);
-                BUTTONS.producerVideo.videoPrivacyButton && !isScreen && videoMenuBarButtons.appendChild(vp);
+                // BUTTONS.producerVideo.videoPrivacyButton && !isScreen && videoMenuBarButtons.appendChild(vp);
                 BUTTONS.producerVideo.snapShotButton && videoMenuBarButtons.appendChild(ts);
-                BUTTONS.producerVideo.videoPictureInPicture &&
-                    this.isVideoPictureInPictureSupported &&
-                    videoMenuBarButtons.appendChild(pip);
-                BUTTONS.producerVideo.videoMirrorButton && videoMenuBarButtons.appendChild(mv);
+                // BUTTONS.producerVideo.videoPictureInPicture &&
+                //     this.isVideoPictureInPictureSupported &&
+                //     videoMenuBarButtons.appendChild(pip);
+                // BUTTONS.producerVideo.videoMirrorButton && videoMenuBarButtons.appendChild(mv);
                 BUTTONS.producerVideo.fullScreenButton && this.isVideoFullScreenSupported && videoMenuBarButtons.appendChild(fs);
 
                 if (!this.isMobileDevice) videoMenuBarButtons.appendChild(pn);
@@ -2521,7 +2522,7 @@ class RoomClient {
                 d.appendChild(pm);
                 d.appendChild(i);
                 d.appendChild(p);
-                //d.appendChild(vb);
+                d.appendChild(vb);
                 vb.appendChild(videoMenuBarLogo)
                 vb.appendChild(videoMenuBarButtons)
                 document.body.appendChild(vb);
@@ -4725,6 +4726,7 @@ class RoomClient {
     canBePinned() {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
+        return true
         return viewportWidth >= 1024 && viewportHeight >= 768;
     }
 
@@ -7300,7 +7302,8 @@ class RoomClient {
                                     isPresenter = true;
                                     this.peer_info.peer_presenter = isPresenter;
                                     this.getId('isUserPresenter').innerText = isPresenter;
-                                    data.password = room_password;
+                                    // data.password = room_password;
+                                    data.password = '123456';
                                     this.socket.emit('roomAction', data);
                                     if (popup) this.roomStatus(action);
                                 }

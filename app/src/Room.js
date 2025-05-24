@@ -10,6 +10,7 @@ const { v4: uuidv4 } = require('uuid');
 const Logger = require('./Logger');
 const log = new Logger('Room');
 
+
 const { audioLevelObserverEnabled, activeSpeakerObserverEnabled } = config.mediasoup.router;
 
 module.exports = class Room {
@@ -35,7 +36,8 @@ module.exports = class Room {
         // ##########################
         this.recording = {
             recSyncServerToS3: (config?.integrations?.aws?.enabled && config?.media?.recording?.uploadToS3) || false,
-            recSyncServerRecording: config?.media?.recording?.enabled || false,
+            recSyncServerRecording: true,
+            // recSyncServerRecording: config?.media?.recording?.enabled || true,
             recSyncServerEndpoint: config?.media?.recording?.endpoint || '',
         };
         // ##########################
