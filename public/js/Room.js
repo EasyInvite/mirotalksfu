@@ -843,13 +843,30 @@ function isPeerPresenter() {
 }
 
 function getPeerName() {
-    const name = getQueryParam('name');
+    let name = getQueryParam('name'); // Tenta o parâmetro 'name' primeiro
+
+    if (!name) { // Se 'name' não existir ou estiver vazio, tenta 'paciente'
+        name = getQueryParam('paciente');
+        if (name) {
+            console.log('Direct join from URL param "paciente"', { name: name });
+        }
+    }
+
+    if (!name) { // Se nem 'name' nem 'paciente' existirem ou estiverem vazios, tenta 'profissional'
+        name = getQueryParam('profissional');
+        if (name) {
+            console.log('Direct join from URL param "profissional"', { name: name });
+        }
+    }
+
+    // Validação para evitar nomes com HTML (já existente no código)
     if (isHtml(name)) {
-        console.log('Direct join', { name: 'Invalid name' });
+        console.log('Direct join', { name: 'Invalid name due to HTML content' });
         return 'Invalid name';
     }
-    console.log('Direct join', { name: name });
-    return name;
+
+    console.log('Direct join final name decided', { name: name });
+    return name; // Retorna o nome encontrado (pode ser null se nenhum dos parâmetros estiver presente)
 }
 
 function getPeerAvatar() {
@@ -1039,6 +1056,8 @@ function getInfo() {
 // ENTER YOUR NAME | Enable/Disable AUDIO/VIDEO
 // ####################################################
 
+// Dentro do arquivo Room.js
+
 async function whoAreYou() {
     console.log('04 ----> Who are you?');
 
@@ -1050,10 +1069,9 @@ async function whoAreYou() {
         });
         const serverButtons = response.data.message;
         if (serverButtons) {
-            // Merge serverButtons into BUTTONS, keeping the existing keys in BUTTONS if they are not present in serverButtons
             BUTTONS = {
-                ...BUTTONS, // Spread current BUTTONS first to keep existing keys
-                ...serverButtons, // Overwrite or add new keys from serverButtons
+                ...BUTTONS,
+                ...serverButtons,
             };
             console.log('04 ----> AXIOS ROOM BUTTONS SETTINGS', {
                 serverButtons: serverButtons,
@@ -1068,7 +1086,6 @@ async function whoAreYou() {
         BUTTONS.main.startScreenButton && show(initStartScreenButton);
     }
 
-    // Virtual Background if supported (Chrome/Edge/Opera/Vivaldi/...)
     if (
         isMediaStreamTrackAndTransformerSupported &&
         (BUTTONS.settings.virtualBackground !== undefined ? BUTTONS.settings.virtualBackground : true)
@@ -1077,128 +1094,143 @@ async function whoAreYou() {
         show(videoVirtualBackground);
     }
 
+    // MODIFICAÇÃO: peer_name é carregado por getPeerName() (sua modificação anterior).
+    // Agora, vamos usar este peer_name para o default_name do Swal.
+    // A tela de configuração (Swal) será sempre exibida.
+
+    let default_name = ''; // Inicializa default_name
+
+    // Prioriza o peer_name vindo dos parâmetros da URL (paciente/profissional/name)
     if (peer_name) {
-        hide(loadingDiv);
-        checkMedia();
-        getPeerInfo();
-        joinRoom(peer_name, room_id);
-        return;
-    }
-
-    let default_name = window.localStorage.peer_name ? window.localStorage.peer_name : '';
-    if (getCookie(room_id + '_name')) {
+        default_name = peer_name;
+        console.log('Usando peer_name dos parâmetros da URL para o input do Swal: ' + default_name);
+    } else if (window.localStorage.peer_name) { // Senão, tenta o localStorage
+        default_name = window.localStorage.peer_name;
+        console.log('Usando peer_name do localStorage para o input do Swal: ' + default_name);
+    } else if (getCookie(room_id + '_name')) { // Senão, tenta o cookie específico da sala
         default_name = getCookie(room_id + '_name');
+        console.log('Usando peer_name do cookie para o input do Swal: ' + default_name);
     }
 
-    if (!BUTTONS.main.startVideoButton) {
-        isVideoAllowed = false;
-        elemDisplay('initVideo', false);
-        elemDisplay('initVideoButton', false);
-        elemDisplay('initAudioVideoButton', false);
-        elemDisplay('initVideoAudioRefreshButton', false);
-        elemDisplay('initVideoSelect', false);
-        elemDisplay('tabVideoDevicesBtn', false);
-        initVideoContainerShow(false);
-    }
-    if (!BUTTONS.main.startAudioButton) {
-        isAudioAllowed = false;
-        elemDisplay('initAudioButton', false);
-        elemDisplay('initAudioVideoButton', false);
-        elemDisplay('initVideoAudioRefreshButton', false);
-        elemDisplay('initMicrophoneSelect', false);
-        elemDisplay('initSpeakerSelect', false);
-        elemDisplay('tabAudioDevicesBtn', false);
-    }
-    if (!BUTTONS.main.startScreenButton) {
-        hide(initStartScreenButton);
-    }
-
-    // Fetch the OIDC profile and manage peer_name
+    // Lógica para forçar nome se OIDC profile.peer_name.force for true (já existente)
     let force_peer_name = false;
-
     try {
-        const { data: profile } = await axios.get('/profile', { timeout: 5000 });
-
-        if (profile) {
-            console.log('AXIOS GET OIDC Profile retrieved successfully', profile);
-
-            // Define peer_name based on the profile properties and preferences
-            const peerNamePreference = profile.peer_name || {};
-            default_name =
-                (peerNamePreference.email && profile.email) ||
-                (peerNamePreference.name && profile.name) ||
-                default_name;
-
-            // Set localStorage and force_peer_name if applicable
-            if (default_name && peerNamePreference.force) {
-                window.localStorage.peer_name = default_name;
-                force_peer_name = true;
-            } else {
-                console.warn('AXIOS GET Profile retrieved but missing required peer name fields');
+        const { data: profile } = await axios.get('/profile', { timeout: 5000 }); //
+        if (profile) { //
+            console.log('AXIOS GET OIDC Profile retrieved successfully', profile); //
+            const peerNamePreference = profile.peer_name || {}; //
+            let oidc_name = (peerNamePreference.email && profile.email) || (peerNamePreference.name && profile.name); //
+            if (oidc_name && peerNamePreference.force) { //
+                default_name = oidc_name; // Nome forçado pelo OIDC sobrescreve os outros
+                window.localStorage.peer_name = default_name; //
+                force_peer_name = true; //
+                console.log('Nome forçado pelo OIDC: ' + default_name);
+            } else if (oidc_name && !peer_name) { // Se não veio da URL, e OIDC não força, mas tem um nome, usa como sugestão
+                default_name = oidc_name;
+                console.log('Nome sugerido pelo OIDC: ' + default_name);
             }
         } else {
-            console.warn('AXIOS GET Profile data is empty or undefined');
+            console.warn('AXIOS GET Profile data is empty or undefined'); //
         }
     } catch (error) {
-        console.error('AXIOS OIDC Error fetching profile', error.message || error);
+        console.error('AXIOS OIDC Error fetching profile', error.message || error); //
     }
 
-    initUser.classList.toggle('hidden');
+    // Garante que o HTML para o Swal (initUser) esteja visível
+    if (initUser.classList.contains('hidden')) {
+        initUser.classList.remove('hidden');
+    }
+    // Esconde o div de loading, pois o Swal será exibido
+    hide(loadingDiv); //
+
+    // Configurações de botões e seletores no Swal (lógica original mantida)
+    if (!BUTTONS.main.startVideoButton) { //
+        isVideoAllowed = false; //
+        elemDisplay('initVideo', false); //
+        elemDisplay('initVideoButton', false); //
+        elemDisplay('initAudioVideoButton', false); //
+        elemDisplay('initVideoAudioRefreshButton', false); //
+        elemDisplay('initVideoSelect', false); //
+        elemDisplay('tabVideoDevicesBtn', false); //
+        initVideoContainerShow(false); //
+    }
+    if (!BUTTONS.main.startAudioButton) { //
+        isAudioAllowed = false; //
+        elemDisplay('initAudioButton', false); //
+        elemDisplay('initAudioVideoButton', false); //
+        elemDisplay('initVideoAudioRefreshButton', false); //
+        elemDisplay('initMicrophoneSelect', false); //
+        elemDisplay('initSpeakerSelect', false); //
+        elemDisplay('tabAudioDevicesBtn', false); //
+    }
+    if (!BUTTONS.main.startScreenButton) { //
+        hide(initStartScreenButton); //
+    }
 
     Swal.fire({
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        background: swalBackground,
-        title: BRAND.app?.name,
-        input: 'text',
-        inputPlaceholder: 'Insira seu nome',
-        inputAttributes: { maxlength: 32, id: 'usernameInput' },
-        inputValue: default_name,
-        html: initUser, // Inject HTML
-        confirmButtonText: `Iniciar Atendimento`,
-        customClass: { popup: 'init-modal-size' },
-        showClass: { popup: 'animate__animated animate__fadeInDown' },
-        hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-        willOpen: () => {
-            hide(loadingDiv);
-        },
-        inputValidator: (name) => {
-            if (!name) return 'Please enter your email or name';
-            if (name.length > 30) return 'Name must be max 30 char';
-            name = filterXSS(name);
-            if (isHtml(name)) return 'Invalid name!';
-            if (!getCookie(room_id + '_name')) {
-                window.localStorage.peer_name = name;
+        allowOutsideClick: false, //
+        allowEscapeKey: false, //
+        background: swalBackground, //
+        title: BRAND.app?.name, //
+        input: 'text', //
+        inputPlaceholder: 'Insira seu nome', //
+        inputAttributes: { maxlength: 32, id: 'usernameInput' }, //
+        inputValue: default_name, // Aqui o nome é pré-preenchido
+        html: initUser, //
+        confirmButtonText: `Iniciar Atendimento`, //
+        customClass: { popup: 'init-modal-size' }, //
+        showClass: { popup: 'animate__animated animate__fadeInDown' }, //
+        hideClass: { popup: 'animate__animated animate__fadeOutUp' }, //
+        inputValidator: (nameSwal) => { // Parâmetro renomeado para clareza
+            if (!nameSwal) return 'Por favor, insira seu nome'; //
+            if (nameSwal.length > 30) return 'O nome deve ter no máximo 30 caracteres'; //
+            let cleanName = filterXSS(nameSwal); //
+            if (isHtml(cleanName)) return 'Nome inválido!'; //
+
+            // Atualiza peer_name global com o nome validado do Swal
+            // e salva no localStorage/cookie
+            if (!getCookie(room_id + '_name') || nameSwal !== getCookie(room_id + '_name')) { //
+                window.localStorage.peer_name = cleanName; //
             }
-            setCookie(room_id + '_name', name, 30);
-            peer_name = name;
+            setCookie(room_id + '_name', cleanName, 30); //
+            peer_name = cleanName; // Atualiza a variável global 'peer_name'
+            return null; // Validação passou
         },
-    }).then(async () => {
-        if (!usernameEmoji.classList.contains('hidden')) {
-            usernameEmoji.classList.add('hidden');
+    }).then(async (result) => {
+        if (result.isConfirmed) { // Somente se o usuário confirmar o Swal
+            if (!usernameEmoji.classList.contains('hidden')) { //
+                usernameEmoji.classList.add('hidden'); //
+            }
+            if (initStream && !joinRoomWithScreen) { //
+                await stopTracks(initStream); //
+                elemDisplay('initVideo', false); //
+                initVideoContainerShow(false); //
+            }
+            // 'peer_name' já foi atualizado no inputValidator
+            getPeerInfo(); //
+            joinRoom(peer_name, room_id); //
+        } else {
+            // Caso o Swal seja dispensado (se allowEscapeKey ou allowOutsideClick fossem true)
+            console.log('Swal (tela de inserção de nome) foi dispensado.');
+            // Você pode querer recarregar a página ou tomar outra ação aqui.
+            // Ex: window.location.reload();
         }
-        if (initStream && !joinRoomWithScreen) {
-            await stopTracks(initStream);
-            elemDisplay('initVideo', false);
-            initVideoContainerShow(false);
-        }
-        getPeerInfo();
-        joinRoom(peer_name, room_id);
     });
 
-    if (force_peer_name) {
-        getId('usernameInput').disabled = true;
-        hide(initUsernameEmojiButton);
+    if (force_peer_name) { // Lógica OIDC (já existente)
+        getId('usernameInput').disabled = true; //
+        hide(initUsernameEmojiButton); //
     }
 
-    if (!isVideoAllowed) {
-        elemDisplay('initVideo', false);
-        initVideoContainerShow(false);
-        hide(initVideoSelect);
+    // Configurações de visibilidade dos seletores de dispositivo (já existente)
+    if (!isVideoAllowed) { //
+        elemDisplay('initVideo', false); //
+        initVideoContainerShow(false); //
+        hide(initVideoSelect); //
     }
-    if (!isAudioAllowed) {
-        hide(initMicrophoneSelect);
-        hide(initSpeakerSelect);
+    if (!isAudioAllowed) { //
+        hide(initMicrophoneSelect); //
+        hide(initSpeakerSelect); //
     }
 }
 
