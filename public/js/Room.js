@@ -3405,7 +3405,7 @@ function handleRoomClientEvents() {
         stopRecordingTimer();
         isRecording = false;
         rc.updatePeerInfo(peer_name, socket.id, 'recording', false);
-        await setDurationIntoAPI()
+        // await setDurationIntoAPI()
     });
     rc.on(RoomClient.EVENTS.raiseHand, () => {
         console.log('Room event: Client raise hand');
