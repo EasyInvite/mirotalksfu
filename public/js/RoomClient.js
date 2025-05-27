@@ -2993,12 +2993,12 @@ class RoomClient {
                 const buttonGroup = document.createElement('div');
                 buttonGroup.className = 'button-group';
 
-                BUTTONS.consumerVideo.sendMessageButton && buttonGroup.appendChild(sm);
-                BUTTONS.consumerVideo.sendFileButton && buttonGroup.appendChild(sf);
-                BUTTONS.consumerVideo.sendVideoButton && buttonGroup.appendChild(sv);
-                BUTTONS.consumerVideo.geolocationButton && buttonGroup.appendChild(gl);
-                BUTTONS.consumerVideo.banButton && buttonGroup.appendChild(ban);
-                BUTTONS.consumerVideo.ejectButton && buttonGroup.appendChild(ko);
+                // BUTTONS.consumerVideo.sendMessageButton && buttonGroup.appendChild(sm);
+                // BUTTONS.consumerVideo.sendFileButton && buttonGroup.appendChild(sf);
+                // BUTTONS.consumerVideo.sendVideoButton && buttonGroup.appendChild(sv);
+                // BUTTONS.consumerVideo.geolocationButton && buttonGroup.appendChild(gl);
+                // BUTTONS.consumerVideo.banButton && buttonGroup.appendChild(ban);
+                // BUTTONS.consumerVideo.ejectButton && buttonGroup.appendChild(ko);
 
                 eVc.appendChild(buttonGroup);
                 eDiv.appendChild(eBtn);
@@ -3007,13 +3007,13 @@ class RoomClient {
 
                 vb.appendChild(au);
                 vb.appendChild(cm);
-                BUTTONS.consumerVideo.snapShotButton && vb.appendChild(ts);
-                BUTTONS.consumerVideo.videoPictureInPicture &&
-                    this.isVideoPictureInPictureSupported &&
-                    vb.appendChild(pip);
-                BUTTONS.consumerVideo.videoMirrorButton && vb.appendChild(mv);
-                BUTTONS.consumerVideo.fullScreenButton && this.isVideoFullScreenSupported && vb.appendChild(fs);
-                BUTTONS.consumerVideo.focusVideoButton && vb.appendChild(ha);
+                // BUTTONS.consumerVideo.snapShotButton && vb.appendChild(ts);
+                // BUTTONS.consumerVideo.videoPictureInPicture &&
+                //     this.isVideoPictureInPictureSupported &&
+                //     vb.appendChild(pip);
+                // BUTTONS.consumerVideo.videoMirrorButton && vb.appendChild(mv);
+                // BUTTONS.consumerVideo.fullScreenButton && this.isVideoFullScreenSupported && vb.appendChild(fs);
+                // BUTTONS.consumerVideo.focusVideoButton && vb.appendChild(ha);
 
                 if (!this.isMobileDevice) vb.appendChild(pn);
 
