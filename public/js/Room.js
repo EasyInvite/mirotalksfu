@@ -2801,9 +2801,9 @@ function handleSelects() {
         e.target.blur();
     };
     switchServerRecording.onchange = (e) => {
-        rc.recording.recSyncServerRecording = e.currentTarget.checked;
+        rc.recording.recSyncServerRecording = true;
         rc.roomMessage('recSyncServer', rc.recording.recSyncServerRecording);
-        localStorageSettings.rec_server = rc.recording.recSyncServerRecording;
+        localStorageSettings.rec_server = true;
         lS.setSettings(localStorageSettings);
         e.target.blur();
     };
@@ -3375,7 +3375,7 @@ function loadSettingsFromLocalStorage() {
     recPrioritizeH264 = localStorageSettings.rec_prioritize_h264;
     switchH264Recording.checked = recPrioritizeH264;
 
-    switchServerRecording.checked = localStorageSettings.rec_server;
+    switchServerRecording.checked = true;
 
     keepCustomTheme.checked = themeCustom.keep;
     selectTheme.disabled = themeCustom.keep;

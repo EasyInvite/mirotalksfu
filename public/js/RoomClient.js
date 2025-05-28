@@ -646,7 +646,7 @@ class RoomClient {
                 if (BUTTONS.settings.tabRecording && !room.config.hostOnlyRecording) {
                     show(roomRecordingServer);
                 }
-                switchServerRecording.checked = this.recording.recSyncServerRecording;
+                switchServerRecording.checked = true;
             }
             console.log('07.1 ----> SERVER SYNC RECORDING', this.recording);
             // ###################################################################################################
@@ -6475,9 +6475,10 @@ class RoomClient {
     }
 
     disableRecordingOptions(disabled = true) {
-        switchH264Recording.disabled = disabled;
-        switchServerRecording.disabled = disabled;
-        switchHostOnlyRecording.disabled = disabled;
+        console.log("disableRecordingOptions commenteded")
+        // switchH264Recording.disabled = disabled;
+        // switchServerRecording.disabled = disabled;
+        // switchHostOnlyRecording.disabled = disabled;
     }
 
     handleLocalRecordingStop() {
