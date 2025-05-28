@@ -647,8 +647,8 @@ function startServer() {
             return res.status(500).json({ message: 'Erro de configuração no servidor MiroTalk.' });
         }
 
-        const loginUrl = 'http://host.docker.internal:3000/auth/login'; // URL da sua API terceira para login
-        const updateUrl = `http://host.docker.internal:3000/scheduling/${scheduling_room_id}`; // URL para o PUT
+        const loginUrl = `${process.env.HOST_API_URL}/auth/login`; // URL da sua API terceira para login
+        const updateUrl = `${process.env.HOST_API_URL}/scheduling/${scheduling_room_id}`; // URL para o PUT
 
         try {
             // 1. Login na sua API terceira
