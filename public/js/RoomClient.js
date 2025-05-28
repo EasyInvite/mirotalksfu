@@ -748,7 +748,7 @@ class RoomClient {
 
         // notify && participantsCount == 1 ? shareRoom() : sound('joined');
         if (notify && participantsCount == 1) {
-            shareRoom();
+            // shareRoom();
         } else {
             if (this.isScreenAllowed) {
                 this.shareScreen();

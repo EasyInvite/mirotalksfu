@@ -626,10 +626,6 @@ function startServer() {
         const { duration, room_id: scheduling_room_id } = req.body; // Pegamos room_id do frontend
 
         console.log(`[BACKEND MIROTALK] Recebido pedido para atualizar duração: room_id=${scheduling_room_id}, duration=${duration}`);
-        res.status(200).json({
-            message: 'Duração atualizada com sucesso na API terceira! (COMENTADO)',
-            apiResponse: putResponse.data,
-        });
 
         // Pegue as credenciais da sua API terceira do .env
         // Estas variáveis PRECISAM estar no seu arquivo .env na raiz do projeto MiroTalk
