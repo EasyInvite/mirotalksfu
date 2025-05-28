@@ -21,6 +21,9 @@ if (location.href.substr(0, 5) !== 'https') location.href = 'https' + location.h
 
 console.log('Window Location', window.location);
 
+let isProfessional = false;
+let forceModeratorRole = false;
+
 const userAgent = navigator.userAgent;
 const parser = new UAParser(userAgent);
 const parserResult = parser.getResult();
@@ -304,6 +307,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function initClient() {
     setTheme();
+    let isProfessionalParam = getQueryParam('isProfessional');
+    isProfessional = isProfessionalParam.toLowerCase() === 'true';
+    console.log('Is Professional Mode:', isProfessional);
+
+
+    let isModeratorParam = getQueryParam('setModeratorRole');
+    forceModeratorRole = (isModeratorParam === 'true' || isModeratorParam === '1');
+    console.log('Forçar Modo Moderador Ativado:', forceModeratorRole);
+
+    // Se o parâmetro forçar o modo moderador, atualize a variável global 'isPresenter'
+    if (forceModeratorRole) {
+        isPresenter = true; // A variável global 'isPresenter' é usada para a UI inicial
+    }
 
     // Transcription
     transcription = new Transcription();
@@ -1015,6 +1031,8 @@ function getPeerInfo() {
         browser_name: parserResult.browser.name,
         browser_version: parserResult.browser.version,
         user_agent: userAgent,
+        peer_presenter: isPresenter,
+        force_moderator_role: forceModeratorRole, // ⭐ Propriedade crucia
     };
 }
 
@@ -1533,12 +1551,19 @@ function roomIsReady() {
     BUTTONS.main.exitButton && show(exitButton);
     BUTTONS.main.shareButton && show(shareButton);
     BUTTONS.main.hideMeButton && show(hideMeButton);
-    if (BUTTONS.settings.tabRecording) {
+    if (BUTTONS.settings.tabRecording && isProfessional) {
         show(startRecButton);
     } else {
         hide(startRecButton);
         hide(tabRecordingBtn);
     }
+    if (isProfessional) {
+        show(startRecButton);
+
+    } else {
+        hide(startRecButton);
+    }
+
     BUTTONS.main.chatButton && show(chatButton);
     BUTTONS.main.pollButton && show(pollButton);
     BUTTONS.main.editorButton && show(editorButton);
@@ -1689,12 +1714,48 @@ function getColor(elem) {
 // SESSION TIMER
 // ####################################################
 
+// function startSessionTimer() {
+//     sessionTime.style.display = 'inline';
+//     let callStartTime = Date.now();
+//     setInterval(function printTime() {
+//         let callElapsedTime = Date.now() - callStartTime;
+//         sessionTime.innerText = getTimeToString(callElapsedTime);
+//     }, 1000);
+// }
+
 function startSessionTimer() {
-    sessionTime.style.display = 'inline';
+    // Pega o elemento original da duração da chamada nas configurações
+    let globalSessionTimeEl = document.getElementById('sessionTime');
+
+    if (globalSessionTimeEl) {
+        // Garante que o elemento original nas configurações seja visível quando o timer iniciar
+        // Se a visibilidade dele já é controlada por outra lógica (ex: abrir o modal), esta linha pode ser opcional.
+        globalSessionTimeEl.style.display = 'inline';
+    }
+
     let callStartTime = Date.now();
-    setInterval(function printTime() {
+
+    // Limpa qualquer intervalo anterior para evitar múltiplos timers, se houver um global
+    if (window.sessionTimeInterval) {
+        clearInterval(window.sessionTimeInterval);
+    }
+
+    window.sessionTimeInterval = setInterval(function printTime() {
         let callElapsedTime = Date.now() - callStartTime;
-        sessionTime.innerText = getTimeToString(callElapsedTime);
+        // A função getTimeToString() já deve existir no seu Room.js e formatar o tempo para HH:MM:SS
+        let formattedTime = getTimeToString(callElapsedTime);
+
+        // 1. Atualiza o elemento original nas configurações (se ele existir)
+        if (globalSessionTimeEl) {
+            globalSessionTimeEl.innerText = formattedTime;
+        }
+
+        // 2. Atualiza todos os elementos de tempo dentro das videoMenuBars
+        //    Eles foram criados em RoomClient.js com a classe 'menu-bar-session-time'
+        let allMenuBarSessionTimes = document.getElementsByClassName('menu-bar-session-time');
+        for (let i = 0; i < allMenuBarSessionTimes.length; i++) {
+            allMenuBarSessionTimes[i].innerText = formattedTime;
+        }
     }, 1000);
 }
 
@@ -3405,7 +3466,7 @@ function handleRoomClientEvents() {
         stopRecordingTimer();
         isRecording = false;
         rc.updatePeerInfo(peer_name, socket.id, 'recording', false);
-        // await setDurationIntoAPI()
+        await setDurationIntoAPI()
     });
     rc.on(RoomClient.EVENTS.raiseHand, () => {
         console.log('Room event: Client raise hand');

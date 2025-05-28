@@ -647,8 +647,8 @@ function startServer() {
             return res.status(500).json({ message: 'Erro de configuração no servidor MiroTalk.' });
         }
 
-        const loginUrl = 'http://host.docker.internal:3001/auth/login'; // URL da sua API terceira para login
-        const updateUrl = `http://host.docker.internal:3001/scheduling/${scheduling_room_id}`; // URL para o PUT
+        const loginUrl = 'http://host.docker.internal:3000/auth/login'; // URL da sua API terceira para login
+        const updateUrl = `http://host.docker.internal:3000/scheduling/${scheduling_room_id}`; // URL para o PUT
 
         try {
             // 1. Login na sua API terceira
@@ -996,6 +996,7 @@ function startServer() {
                     Bucket: bucket,
                     Key: key,
                     Body: fileStream,
+                    ACL: 'public-read',
                     Metadata: {
                         'room-id': roomId,
                         'file-name': fileName,
@@ -1754,9 +1755,18 @@ function startServer() {
                 os_version,
                 browser_name,
                 browser_version,
+                force_moderator_role,
             } = data.peer_info;
 
             let is_presenter = peer_presenter;
+
+            if (force_moderator_role) {
+                is_presenter = true;
+                log.info('[Join] - Force moderator role for peer', {
+                    peer_name,
+                    peer_uuid,
+                });
+            }
 
             // User Auth required or detect token, we check if peer valid
             if (hostCfg.user_auth || peer_token) {
