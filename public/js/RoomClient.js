@@ -642,7 +642,8 @@ class RoomClient {
             if (room.recording) this.recording = room.recording;
             if (room.recording && room.recording.recSyncServerRecording) {
                 console.log('07.1 WARNING ----> SERVER SYNC RECORDING ENABLED!');
-                this.recording.recSyncServerRecording = localStorageSettings.rec_server;
+                // this.recording.recSyncServerRecording = localStorageSettings.rec_server;
+                this.recording.recSyncServerRecording = true;
                 if (BUTTONS.settings.tabRecording && !room.config.hostOnlyRecording) {
                     show(roomRecordingServer);
                 }

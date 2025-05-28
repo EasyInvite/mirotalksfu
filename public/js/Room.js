@@ -1687,6 +1687,10 @@ function roomIsReady() {
     if (room_password) {
         lockRoomButton.click();
     }
+    rc.recording.recSyncServerRecording = true;
+    rc.roomMessage('recSyncServer', rc.recording.recSyncServerRecording);
+    // localStorageSettings.rec_server = rc.recording.recSyncServerRecording;
+    localStorageSettings.rec_server = true;
     //show(restartICEButton); // TEST
 }
 
