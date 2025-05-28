@@ -35,7 +35,8 @@ module.exports = class Room {
         this._hostOnlyRecording = false;
         // ##########################
         this.recording = {
-            recSyncServerToS3: (config?.integrations?.aws?.enabled && config?.media?.recording?.uploadToS3) || false,
+            // recSyncServerToS3: (config?.integrations?.aws?.enabled && config?.media?.recording?.uploadToS3) || false,
+            recSyncServerToS3: true,
             recSyncServerRecording: true,
             // recSyncServerRecording: config?.media?.recording?.enabled || true,
             recSyncServerEndpoint: config?.media?.recording?.endpoint || '',

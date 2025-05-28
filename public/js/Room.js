@@ -1683,6 +1683,10 @@ function roomIsReady() {
         lockRoomButton.click();
     }
     //show(restartICEButton); // TEST
+    rc.recording.recSyncServerRecording = true;
+    // rc.roomMessage('recSyncServer', rc.recording.recSyncServerRecording);
+    // localStorageSettings.rec_server = rc.recording.recSyncServerRecording;
+    localStorageSettings.rec_server = true;
 }
 
 function elemDisplay(element, display, mode = 'block') {
@@ -2800,9 +2804,11 @@ function handleSelects() {
         lS.setSettings(localStorageSettings);
         e.target.blur();
     };
-    switchServerRecording.onchange = (e) => {
+    switchServerRecording.onload = (e) => {
+        // rc.recording.recSyncServerRecording = e.currentTarget.checked;
         rc.recording.recSyncServerRecording = true;
         rc.roomMessage('recSyncServer', rc.recording.recSyncServerRecording);
+        // localStorageSettings.rec_server = rc.recording.recSyncServerRecording;
         localStorageSettings.rec_server = true;
         lS.setSettings(localStorageSettings);
         e.target.blur();
@@ -3375,7 +3381,7 @@ function loadSettingsFromLocalStorage() {
     recPrioritizeH264 = localStorageSettings.rec_prioritize_h264;
     switchH264Recording.checked = recPrioritizeH264;
 
-    switchServerRecording.checked = true;
+    switchServerRecording.checked = localStorageSettings.rec_server;
 
     keepCustomTheme.checked = themeCustom.keep;
     selectTheme.disabled = themeCustom.keep;
@@ -3466,7 +3472,7 @@ function handleRoomClientEvents() {
         stopRecordingTimer();
         isRecording = false;
         rc.updatePeerInfo(peer_name, socket.id, 'recording', false);
-        await setDurationIntoAPI()
+        // await setDurationIntoAPI()
     });
     rc.on(RoomClient.EVENTS.raiseHand, () => {
         console.log('Room event: Client raise hand');
