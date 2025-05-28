@@ -7367,8 +7367,8 @@ class RoomClient {
                                     isPresenter = true;
                                     this.peer_info.peer_presenter = isPresenter;
                                     this.getId('isUserPresenter').innerText = isPresenter;
-                                    // data.password = room_password;
-                                    data.password = '123456';
+                                    data.password = room_password;
+                                    // data.password = '123456';
                                     this.socket.emit('roomAction', data);
                                     if (popup) this.roomStatus(action);
                                 }

@@ -925,8 +925,8 @@ function getRoomPassword() {
         console.log('Direct join', { password: roomPassword });
         return roomPassword;
     }
-    return 123456
-    // return false;
+    // return 123456
+    return false;
 }
 
 function getRoomDuration() {
