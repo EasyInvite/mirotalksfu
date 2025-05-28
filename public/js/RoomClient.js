@@ -6475,10 +6475,9 @@ class RoomClient {
     }
 
     disableRecordingOptions(disabled = true) {
-        console.log("disableRecordingOptions commenteded")
-        // switchH264Recording.disabled = disabled;
-        // switchServerRecording.disabled = disabled;
-        // switchHostOnlyRecording.disabled = disabled;
+        switchH264Recording.disabled = disabled;
+        switchServerRecording.disabled = disabled;
+        switchHostOnlyRecording.disabled = disabled;
     }
 
     handleLocalRecordingStop() {
